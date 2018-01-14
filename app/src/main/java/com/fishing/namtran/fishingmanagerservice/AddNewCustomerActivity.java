@@ -5,17 +5,20 @@ import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
 import android.app.TimePickerDialog;
 import android.database.Cursor;
+import android.support.design.widget.TextInputLayout;
 import android.support.v7.app.AppCompatActivity;
 import android.os.AsyncTask;
 
 import android.os.Build;
 import android.os.Bundle;
 import android.text.Editable;
+import android.text.InputType;
 import android.text.TextUtils;
 import android.text.TextWatcher;
 import android.view.KeyEvent;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.ViewGroup;
 import android.view.inputmethod.EditorInfo;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
@@ -23,6 +26,7 @@ import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.CheckBox;
 import android.widget.EditText;
+import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.TimePicker;
@@ -56,8 +60,9 @@ public class AddNewCustomerActivity extends AppCompatActivity {
 
     // UI references.
     private AutoCompleteTextView mFullNameView;
-    private EditText mMobileView;
-    private EditText mDatInView;
+    private EditText mIdNumberView;
+    private EditText mDateInView;
+    private TextInputLayout mTextInputLayoutView;
     private EditText mNoteView;
     private CheckBox mFeedTypeView;
     private View mProgressView;
@@ -70,9 +75,8 @@ public class AddNewCustomerActivity extends AppCompatActivity {
         setContentView(R.layout.activity_add_new_customer);
 
         // Set up the login form.
-        mMobileView = (EditText) findViewById(R.id.mobile);
+        mIdNumberView = (EditText) findViewById(R.id.id_number);
         mFullNameView = (AutoCompleteTextView) findViewById(R.id.fullname);
-        mDatInView = (EditText) findViewById(R.id.date_in);
         mNoteView = (EditText) findViewById(R.id.note);
         mFeedTypeView = (CheckBox) findViewById(R.id.feed_type);
         mSubmitFormView = findViewById(R.id.add_new_customer_form);
@@ -86,16 +90,23 @@ public class AddNewCustomerActivity extends AppCompatActivity {
             }
         });
 
-        //Focus date in
-        mDatInView.setOnFocusChangeListener(new View.OnFocusChangeListener() {
-            @Override
-            public void onFocusChange(View view, boolean hasFocus) {
-                if(hasFocus) {
-                    EditText editText = (EditText) mDatInView;
-                    GetTimePicker(editText);
+        if(false) {
+            Utils util = new Utils();
+            util.CreateEditText(this, "", R.id.date_in, getString(R.string.date_in), InputType.TYPE_CLASS_TEXT, 1, 3);
+
+            mDateInView = (EditText) findViewById(R.id.date_in);
+
+            //Focus date in
+            mDateInView.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+                @Override
+                public void onFocusChange(View view, boolean hasFocus) {
+                    if (hasFocus) {
+                        EditText editText = (EditText) mDateInView;
+                        GetTimePicker(editText);
+                    }
                 }
-            }
-        });
+            });
+        }
 
         //Get customers from database by current day
         DateFormat currentDateFormat = new SimpleDateFormat("yyyy/MM/dd");
@@ -104,7 +115,6 @@ public class AddNewCustomerActivity extends AppCompatActivity {
         CustomerManager customerManager = new CustomerManager(getApplicationContext());
         //SearchCustomers = customerManager.getSearchCustomers(currentDateFormat.format(currentDate));
         SearchCustomers = customerManager.getSearchAllCustomers();
-
         searchCustomers(SearchCustomers);
     }
 
@@ -126,7 +136,7 @@ public class AddNewCustomerActivity extends AppCompatActivity {
         listViewAdapterContent = new String[searchCustomers.getCount()];
         while (searchCustomers.moveToNext())
         {
-            listViewAdapterContent[i] = searchCustomers.getString(searchCustomers.getColumnIndexOrThrow(Customers.Properties.FULLNAME)) + " - " + searchCustomers.getString(searchCustomers.getColumnIndexOrThrow(Customers.Properties.MOBILE));
+            listViewAdapterContent[i] = searchCustomers.getString(searchCustomers.getColumnIndexOrThrow(Customers.Properties.FULLNAME)) + " - " + searchCustomers.getString(searchCustomers.getColumnIndexOrThrow(Customers.Properties.ID_NUMBER));
             i++;
         }
 
@@ -143,7 +153,7 @@ public class AddNewCustomerActivity extends AppCompatActivity {
                 String item = listAdapter.getItem(position);
                 String[] fullname = item.split("-");
                 mFullNameView.setText(fullname[0].trim());
-                mMobileView.setText(fullname[1].trim());
+                mIdNumberView.setText(fullname[1].trim());
                 itemList.setVisibility(View.GONE);
             }
         });
@@ -163,7 +173,7 @@ public class AddNewCustomerActivity extends AppCompatActivity {
             public void afterTextChanged(Editable s) {
                 if (mFullNameView.getText().toString().equals("") || listAdapter.isEmpty()) {
                     itemList.setVisibility(View.GONE);
-                    mMobileView.setText("");
+                    mIdNumberView.setText("");
                 }
             }
         });
@@ -203,27 +213,19 @@ public class AddNewCustomerActivity extends AppCompatActivity {
 
         // Reset errors.
         mFullNameView.setError(null);
-        mMobileView.setError(null);
-        mDatInView.setError(null);
+        mDateInView.setError(null);
         mFeedTypeView.setError(null);
         mFeedTypeView.setError(null);
 
         // Store values at the time of the login attempt.
         String fullname = mFullNameView.getText().toString();
-        String mobile = mMobileView.getText().toString();
-        String dateIn = mDatInView.getText().toString();
+        String mobile = mIdNumberView.getText().toString();
+        String dateIn = mDateInView.getText().toString();
         String note = mNoteView.getText().toString();
         boolean feedType = mFeedTypeView.isChecked();
 
         boolean cancel = false;
         View focusView = null;
-
-        // Check for a valid mobile, if the user entered one.
-        if (!TextUtils.isEmpty(mobile) && !isMobileValid(mobile)) {
-            mMobileView.setError(getString(R.string.error_invalid_mobile));
-            focusView = mMobileView;
-            cancel = true;
-        }
 
         if (TextUtils.isEmpty(fullname)) {
             mFullNameView.setError(getString(R.string.error_field_required));
@@ -232,8 +234,8 @@ public class AddNewCustomerActivity extends AppCompatActivity {
         }
 
         if (TextUtils.isEmpty(dateIn)) {
-            mDatInView.setError(getString(R.string.error_field_required));
-            focusView = mDatInView;
+            mDateInView.setError(getString(R.string.error_field_required));
+            focusView = mDateInView;
             cancel = true;
         }
 
@@ -248,11 +250,6 @@ public class AddNewCustomerActivity extends AppCompatActivity {
             mCustomerTask = new CustomerActionTask(fullname, mobile, dateIn, feedType, note);
             mCustomerTask.execute((Void) null);
         }
-    }
-
-    private boolean isMobileValid(String mobile) {
-        //TODO: Replace this with your own logic
-        return mobile.length() >= 4;
     }
 
     /**
@@ -297,14 +294,14 @@ public class AddNewCustomerActivity extends AppCompatActivity {
     public class CustomerActionTask extends AsyncTask<Void, Void, Boolean> {
 
         private final String mFullName;
-        private final String mMobile;
+        private final String mIdNumber;
         private final String mDateIn;
         private final String mNote;
         private final boolean mFeedType;
 
-        CustomerActionTask(String fullname, String mobile, String dateIn, boolean feedType, String note) {
+        CustomerActionTask(String fullname, String idNumber, String dateIn, boolean feedType, String note) {
             mFullName = fullname;
-            mMobile = mobile;
+            mIdNumber = idNumber;
             mDateIn = dateIn;
             mNote = note;
             mFeedType = feedType;
@@ -334,7 +331,7 @@ public class AddNewCustomerActivity extends AppCompatActivity {
                 FishingManager fishing = new FishingManager(getApplicationContext());
                 KeepFishingManager keepFishing = new KeepFishingManager(getApplicationContext());
 
-                long custId = customer.createCustomer(mFullName, mMobile);
+                long custId = customer.createCustomer(mFullName, mIdNumber);
                 long fishingId = fishing.createFishingEntry(custId, fullDateIn, mFeedType ? 1 : 0, mNote);
                 long keepFishingId = keepFishing.createKeepFishingEntry(custId, 0, 0, 0, 0, 0, "");
 

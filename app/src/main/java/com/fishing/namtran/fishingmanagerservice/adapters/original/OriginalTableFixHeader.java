@@ -52,7 +52,7 @@ public class OriginalTableFixHeader {
         OriginalTableFixHeaderAdapter adapter = new OriginalTableFixHeaderAdapter(context);
         List<Nexus> body = getBody();
 
-        adapter.setFirstHeader(context.getString(R.string.number_fishing));
+        adapter.setFirstHeader(context.getString(R.string.order));
         adapter.setHeader(getHeader());
         adapter.setFirstBody(body);
         adapter.setBody(body);
@@ -94,9 +94,23 @@ public class OriginalTableFixHeader {
                 //viewGroup.vg_root.setBackgroundColor(ContextCompat.getColor(context, R.color.colorYellow));
 
                 if(totalItems != row) {
-                    final String fishingId = item.data[0];
+
+                    int fishingId = 0;
+                    DateFormat sqlDateFormat = new SimpleDateFormat("yyyy/MM/dd");
+                    Date currentDate = new Date();
+                    Cursor fishingEntries = (new FishingManager(context)).getFishingEntries(sqlDateFormat.format(currentDate));
+
+                    while (fishingEntries.moveToNext())
+                    {
+                        if((fishingEntries.getPosition() + 1) == Integer.valueOf(item.data[0])) {
+                            fishingId =  fishingEntries.getInt(fishingEntries.getColumnIndexOrThrow(Fishings.Properties._ID));
+                            break;
+                        }
+                    }
+                    fishingEntries.close();
+
                     final FishingManager fishings = new FishingManager(context);
-                    Cursor cursors = fishings.getFishingEntryByFishingId(fishingId);
+                    Cursor cursors = fishings.getFishingEntryByFishingId(String.valueOf(fishingId));
 
                     String dateOut = null;
                     final int status;
@@ -106,7 +120,7 @@ public class OriginalTableFixHeader {
 
                     if (dateOut == null) {
                         if (column == 5) {
-                            status = fishings.setFeedTypeStatus(fishingId);
+                            status = fishings.setFeedTypeStatus(String.valueOf(fishingId));
                             viewGroup.textView.setText(status == 1 ? context.getString(R.string.yes) : context.getString(R.string.no));
                             adapter.setBody(getBody());
                         /*
@@ -131,7 +145,7 @@ public class OriginalTableFixHeader {
                                     .setNegativeButton(android.R.string.no, null).show();*/
 
                         } else {
-                            Utils.Redirect(context, UpdateCustomerActivity.class, "fishingId", item.data[0]);
+                            Utils.Redirect(context, UpdateCustomerActivity.class, "fishingId", String.valueOf(fishingId));
                         }
                     }
                 }
@@ -201,7 +215,7 @@ public class OriginalTableFixHeader {
     private List<String> getHeader() {
         final String headers[] = {
                 context.getString(R.string.fullname),
-                context.getString(R.string.mobile),
+                context.getString(R.string.number_fishing),
                 context.getString(R.string.date_in),
                 context.getString(R.string.date_out),
                 context.getString(R.string.total_hours),
@@ -244,6 +258,7 @@ public class OriginalTableFixHeader {
         settings.close();
         */
 
+        int order = 1;
         while (fishings.moveToNext()) {
             String dateIn = fishings.getString(fishings.getColumnIndexOrThrow(Fishings.Properties.DATE_IN));
             String dateOut = fishings.getString(fishings.getColumnIndexOrThrow(Fishings.Properties.DATE_OUT));
@@ -277,9 +292,9 @@ public class OriginalTableFixHeader {
             totalMoney += fishings.getInt(fishings.getColumnIndexOrThrow(Fishings.Properties.TOTAL_MONEY));
 
             items.add(new Nexus(
-                    fishings.getString(fishings.getColumnIndexOrThrow(Fishings.Properties._ID)),
+                    String.valueOf(order),
                     fishings.getString(fishings.getColumnIndexOrThrow(Customers.Properties.FULLNAME)),
-                    fishings.getString(fishings.getColumnIndexOrThrow(Customers.Properties.MOBILE)),
+                    fishings.getString(fishings.getColumnIndexOrThrow(Customers.Properties.ID_NUMBER)),
                     dateInView,
                     dateOutView,
                     totalHoursView,
@@ -287,6 +302,7 @@ public class OriginalTableFixHeader {
                     fishings.getString(fishings.getColumnIndexOrThrow(KeepFishing.Properties.TOTAL_FISH)),
                     fishings.getString(fishings.getColumnIndexOrThrow(Fishings.Properties.TOTAL_MONEY)),
                     fishings.getString(fishings.getColumnIndexOrThrow(Fishings.Properties.NOTE))));
+            order++;
         }
         items.add(new Nexus(context.getString(R.string.total_all) + ": " + onlineCount + "/" + totalFisher, "", "", "", "", "", "", totalFish + "", totalMoney + "", ""));
         totalItems = items.size() - 1;

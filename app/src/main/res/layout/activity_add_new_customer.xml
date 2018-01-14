@@ -60,39 +60,16 @@
                 android:layout_height="wrap_content">
 
                 <EditText
-                    android:id="@+id/mobile"
+                    android:id="@+id/id_number"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="@string/mobile"
+                    android:hint="@string/number_fishing"
                     android:imeActionId="@+id/login"
                     android:imeActionLabel="@string/action_submit_short"
                     android:imeOptions="actionUnspecified"
-                    android:inputType="number"
+                    android:inputType="text"
                     android:maxLines="1"
                     android:singleLine="true" />
-
-            </android.support.design.widget.TextInputLayout>
-
-            <android.support.design.widget.TextInputLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
-
-                <EditText
-                    android:id="@+id/date_in"
-                    android:layout_width="match_parent"
-                    android:layout_height="wrap_content"
-                    android:hint="@string/date_in"
-                    android:imeActionId="@+id/login"
-                    android:imeActionLabel="@string/action_submit_short"
-                    android:imeOptions="actionUnspecified"
-                    android:maxLines="1"
-                    android:singleLine="true" />
-
-            </android.support.design.widget.TextInputLayout>
-
-            <android.support.design.widget.TextInputLayout
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content">
 
             </android.support.design.widget.TextInputLayout>
 

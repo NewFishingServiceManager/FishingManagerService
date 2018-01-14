@@ -21,22 +21,22 @@ public class CustomerManager {
         this.context = context;
     }
 
-    public long createCustomer(String mFullName, String mMobile) {
+    public long createCustomer(String mFullName, String mIdNumber) {
 
         InitializeDatabase mDbHelper = new InitializeDatabase(context);
         db = mDbHelper.getWritableDatabase();
-        long customerId = checkCustomerExisted(mMobile);
 
-        if( customerId < 0) {
+        long customerId = checkIdNumberExisted(mIdNumber);
+        if(customerId < 0) {
             // Create a new map of values, where column names are the keys
             ContentValues values = new ContentValues();
             values.put(Customers.Properties.FULLNAME, mFullName);
-            values.put(Customers.Properties.MOBILE, mMobile);
+            values.put(Customers.Properties.ID_NUMBER, mIdNumber);
 
             // Insert the new row, returning the primary key value of the new row
             customerId = db.insert(Customers.Properties.TABLE_NAME, null, values);
         } else { //Update new infos for customer
-            updateCustomer(mFullName, mMobile);
+            updateCustomer(mFullName, mIdNumber);
         }
 
         //close connection
@@ -84,7 +84,44 @@ public class CustomerManager {
         return -1;
     }
 
-    public void updateCustomer(String mFullName, String mMobile) {
+    public long checkIdNumberExisted(String idNumber)
+    {
+        InitializeDatabase mDbHelper = new InitializeDatabase(context);
+        db = mDbHelper.getReadableDatabase();
+
+        // Define a projection that specifies which columns from the database
+        // you will actually use after this query.
+        String[] projection = {
+                Customers.Properties._ID,
+                Customers.Properties.FULLNAME,
+                Customers.Properties.ID_NUMBER,
+        };
+
+        String selection = Customers.Properties.ID_NUMBER + " = ?";
+        String[] selectionArgs = { idNumber };
+
+        Cursor cursor = db.query(
+                Customers.Properties.TABLE_NAME,              // The table to query
+                projection,                               // The columns to return
+                selection,                                // The columns for the WHERE clause
+                selectionArgs,                            // The values for the WHERE clause
+                null,                                     // don't group the rows
+                null,                                     // don't filter by row groups
+                null                                 // The sort order
+        );
+
+        if(cursor.moveToNext()) {
+            if(idNumber.equals(cursor.getString(cursor.getColumnIndexOrThrow(Customers.Properties.ID_NUMBER)))) {
+                long custId = cursor.getLong(cursor.getColumnIndexOrThrow(Customers.Properties._ID));
+                cursor.close();
+                return custId;
+            }
+        }
+        cursor.close();
+        return -1;
+    }
+
+    public void updateCustomer(String mFullName, String mIdNumber) {
         InitializeDatabase mDbHelper = new InitializeDatabase(context);
         db = mDbHelper.getWritableDatabase();
 
@@ -93,8 +130,8 @@ public class CustomerManager {
         values.put(Customers.Properties.FULLNAME, mFullName);
 
         // Which row to update, based on the title
-        String selection = Customers.Properties.MOBILE + " LIKE ?";
-        String[] selectionArgs = { mMobile };
+        String selection = Customers.Properties.ID_NUMBER + " LIKE ?";
+        String[] selectionArgs = { mIdNumber };
 
         int count = db.update(
                 Customers.Properties.TABLE_NAME,
@@ -125,7 +162,7 @@ public class CustomerManager {
         InitializeDatabase mDbHelper = new InitializeDatabase(context);
         db = mDbHelper.getReadableDatabase();
 
-        String query = "SELECT customer." + Customers.Properties._ID + ", customer." + Customers.Properties.FULLNAME + ", customer." + Customers.Properties.MOBILE +
+        String query = "SELECT customer." + Customers.Properties._ID + ", customer." + Customers.Properties.FULLNAME + ", customer." + Customers.Properties.MOBILE + ", customer." + Customers.Properties.ID_NUMBER +
                 " ,keepFishing." + KeepFishing.Properties.KEEP_FISH + " ,keepFishing." + KeepFishing.Properties.TOTAL_FISH + " ,keepFishing." + KeepFishing.Properties.NOTE +
                 " FROM " +  Customers.Properties.TABLE_NAME + " customer LEFT JOIN " + KeepFishing.Properties.TABLE_NAME + " keepFishing" +
                 " WHERE " + "customer." + Customers.Properties._ID + " = " + "keepFishing." + KeepFishing.Properties.CUSTOMER_ID;

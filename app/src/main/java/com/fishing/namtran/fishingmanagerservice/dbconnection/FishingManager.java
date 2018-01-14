@@ -316,7 +316,7 @@ public class FishingManager {
         db = mDbHelper.getReadableDatabase();
 
         String query = "SELECT fishing." + Fishings.Properties.DATE_IN + ", fishing." + Fishings.Properties.DATE_OUT + ", fishing." + Fishings.Properties.FEED_TYPE + ", fishing." + Fishings.Properties.NOTE
-                                + ", fishing." + Fishings.Properties._ID + ", fishing." + Fishings.Properties.TOTAL_MONEY + " , customer." + Customers.Properties.FULLNAME + ", customer." + Customers.Properties.MOBILE + ", customer." + Customers.Properties._ID + " AS customerId"
+                                + ", fishing." + Fishings.Properties._ID + ", fishing." + Fishings.Properties.TOTAL_MONEY + " , customer." + Customers.Properties.FULLNAME + ", customer." + Customers.Properties.MOBILE + ", customer." + Customers.Properties._ID + " AS customerId" + ", customer." + Customers.Properties.ID_NUMBER
                                 + ", keepfishing." + KeepFishing.Properties.KEEP_HOURS + ", keepfishing." + KeepFishing.Properties.NO_KEEP_HOURS + ", keepfishing." + KeepFishing.Properties.KEEP_FISH
                                 + ", keepfishing." + KeepFishing.Properties.TAKE_FISH + ", keepfishing." + KeepFishing.Properties.TOTAL_FISH +
                         " FROM " +  Fishings.Properties.TABLE_NAME + " fishing, " + Customers.Properties.TABLE_NAME + " customer, " + KeepFishing.Properties.TABLE_NAME + " keepfishing" +
@@ -331,7 +331,7 @@ public class FishingManager {
         db = mDbHelper.getReadableDatabase();
 
         String query = "SELECT fishing." + Fishings.Properties.DATE_IN + ", fishing." + Fishings.Properties.DATE_OUT + ", fishing." + Fishings.Properties.FEED_TYPE + ", fishing." + Fishings.Properties.NOTE
-                + ", customer." + Customers.Properties._ID + ", customer." + Customers.Properties.FULLNAME + ", customer." + Customers.Properties.MOBILE
+                + ", customer." + Customers.Properties._ID + ", customer." + Customers.Properties.FULLNAME + ", customer." + Customers.Properties.MOBILE + ", customer." + Customers.Properties.ID_NUMBER
                 + ", keepfishing." + KeepFishing.Properties.KEEP_HOURS + ", keepfishing." + KeepFishing.Properties.NO_KEEP_HOURS + ", keepfishing." + KeepFishing.Properties.KEEP_FISH
                 + ", keepfishing." + KeepFishing.Properties.TAKE_FISH + ", keepfishing." + KeepFishing.Properties.TOTAL_FISH +
                 " FROM " +  Fishings.Properties.TABLE_NAME + " fishing, " + Customers.Properties.TABLE_NAME + " customer, " + KeepFishing.Properties.TABLE_NAME + " keepfishing" +

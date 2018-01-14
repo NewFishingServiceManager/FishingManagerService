@@ -13,6 +13,7 @@ public final class Customers {
     public static class Properties implements BaseColumns {
         public static final String TABLE_NAME = "customers";
         public static final String FULLNAME = "fullname";
+        public static final String ID_NUMBER = "id_number";
         public static final String MOBILE = "mobile";
         public static final String GENDER = "gender";
         public static final String AGE = "age";

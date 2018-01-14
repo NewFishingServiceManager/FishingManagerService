@@ -66,6 +66,7 @@ public class InitializeDatabase extends SQLiteOpenHelper {
             "CREATE TABLE IF NOT EXISTS " + Customers.Properties.TABLE_NAME + " (" +
                     Customers.Properties._ID + " INTEGER PRIMARY KEY," +
                     Customers.Properties.FULLNAME + " TEXT," +
+                    Customers.Properties.ID_NUMBER + " TEXT," +
                     Customers.Properties.MOBILE + " TEXT); ";
 
     /*---------------- Insert sample records -----------------------*/
@@ -89,7 +90,8 @@ public class InitializeDatabase extends SQLiteOpenHelper {
             "INSERT INTO " + Customers.Properties.TABLE_NAME + " (" +
                     Customers.Properties._ID + "," +
                     Customers.Properties.FULLNAME + "," +
-                    Customers.Properties.MOBILE + ") VALUES ( 1, 'Anh Nam', '0909686767' ); ";
+                    Customers.Properties.ID_NUMBER + "," +
+                    Customers.Properties.MOBILE + ") VALUES ( 1, 'Anh Nam', '10', '' ); ";
 
     private static final String SQL_CREATE_FISHINGS_RECORDS =
             "INSERT INTO " + Fishings.Properties.TABLE_NAME + " (" +

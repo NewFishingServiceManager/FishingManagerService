@@ -16,6 +16,7 @@
     <string name="fishing_status">Khách hàng này đang tham gia câu.</string>
 
     <string name="number_fishing">Mã Số</string>
+    <string name="order">Thứ Tự</string>
     <string name="fullname">Họ Tên</string>
     <string name="mobile">Điện Thoại</string>
     <string name="date_in">Giờ Vào</string>
@@ -40,6 +41,11 @@
     <string name="total_all">Tổng</string>
     <string name="log">Lich Sử</string>
     <string name="buy_fish">Mua Cá</string>
+    <string name="date">Ngày</string>
+    <string name="server_email">Server Email</string>
+    <string name="server_pass">Server Password</string>
+    <string name="receive_email">Email Nhận</string>
+    <string name="access">Truy Cập</string>
 
     <string name="customer_manager">Quản Lý KH</string>
     <string name="report">Báo Cáo</string>
