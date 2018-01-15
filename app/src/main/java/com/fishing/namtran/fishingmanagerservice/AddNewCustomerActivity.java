@@ -68,6 +68,7 @@ public class AddNewCustomerActivity extends AppCompatActivity {
     private View mProgressView;
     private View mSubmitFormView;
     private Cursor SearchCustomers;
+    private static final int afterTime = 20;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -90,7 +91,7 @@ public class AddNewCustomerActivity extends AppCompatActivity {
             }
         });
 
-        if(false) {
+        if(Utils.checkAfterTime(afterTime)) {
             Utils util = new Utils();
             util.CreateEditText(this, "", R.id.date_in, getString(R.string.date_in), InputType.TYPE_CLASS_TEXT, 1, 3);
 
@@ -213,14 +214,18 @@ public class AddNewCustomerActivity extends AppCompatActivity {
 
         // Reset errors.
         mFullNameView.setError(null);
-        mDateInView.setError(null);
         mFeedTypeView.setError(null);
         mFeedTypeView.setError(null);
+
+        if(Utils.checkAfterTime(afterTime))
+        {
+            mDateInView.setError(null);
+        }
 
         // Store values at the time of the login attempt.
         String fullname = mFullNameView.getText().toString();
         String mobile = mIdNumberView.getText().toString();
-        String dateIn = mDateInView.getText().toString();
+        String dateIn = Utils.checkAfterTime(afterTime) ? mDateInView.getText().toString() : null;
         String note = mNoteView.getText().toString();
         boolean feedType = mFeedTypeView.isChecked();
 
@@ -233,7 +238,7 @@ public class AddNewCustomerActivity extends AppCompatActivity {
             cancel = true;
         }
 
-        if (TextUtils.isEmpty(dateIn)) {
+        if (TextUtils.isEmpty(dateIn) && Utils.checkAfterTime(afterTime)) {
             mDateInView.setError(getString(R.string.error_field_required));
             focusView = mDateInView;
             cancel = true;
@@ -324,7 +329,7 @@ public class AddNewCustomerActivity extends AppCompatActivity {
             showProgress(false);
             DateFormat currentDateFormat = new SimpleDateFormat("yyyy/MM/dd");
             Date currentDate = new Date();
-            String fullDateIn = currentDateFormat.format(currentDate) + " " + mDateIn + ":00";
+            String fullDateIn = Utils.checkAfterTime(afterTime) ? currentDateFormat.format(currentDate) + " " + mDateIn + ":00" : (new SimpleDateFormat("yyyy/MM/dd HH:mm:00")).format(Utils.GetCurrentTimeByRoundFiveMinutes());
 
             if (success) {
                 CustomerManager customer = new CustomerManager(getApplicationContext());
@@ -333,15 +338,8 @@ public class AddNewCustomerActivity extends AppCompatActivity {
 
                 long custId = customer.createCustomer(mFullName, mIdNumber);
                 long fishingId = fishing.createFishingEntry(custId, fullDateIn, mFeedType ? 1 : 0, mNote);
-                long keepFishingId = keepFishing.createKeepFishingEntry(custId, 0, 0, 0, 0, 0, "");
-
-                if(fishingId == -1)
-                {
-                    Utils.Alert(AddNewCustomerActivity.this, getString(R.string.fishing_status));
-                }
-                else {
-                    finish();
-                }
+                keepFishing.createKeepFishingEntry(custId, 0, 0, 0, 0, 0, "");
+                finish();
             } else {
                 Utils.Alert(AddNewCustomerActivity.this, getString(R.string.action_error));
             }

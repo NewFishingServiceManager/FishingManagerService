@@ -28,20 +28,17 @@ public class FishingManager {
 
         InitializeDatabase mDbHelper = new InitializeDatabase(context);
         db = mDbHelper.getWritableDatabase();
-        String datetime = mDateIn.split(" ")[0];
         long fishingId = -1;
 
-        if(!checkFishingEntryExisted(mCustomerId, datetime)) {
-            // Create a new map of values, where column names are the keys
-            ContentValues values = new ContentValues();
-            values.put(Fishings.Properties.CUSTOMER_ID, mCustomerId);
-            values.put(Fishings.Properties.DATE_IN, mDateIn);
-            values.put(Fishings.Properties.FEED_TYPE, mFeedType);
-            values.put(Fishings.Properties.NOTE, mNote);
+        // Create a new map of values, where column names are the keys
+        ContentValues values = new ContentValues();
+        values.put(Fishings.Properties.CUSTOMER_ID, mCustomerId);
+        values.put(Fishings.Properties.DATE_IN, mDateIn);
+        values.put(Fishings.Properties.FEED_TYPE, mFeedType);
+        values.put(Fishings.Properties.NOTE, mNote);
 
-            // Insert the new row, returning the primary key value of the new row
-            fishingId = db.insert(Fishings.Properties.TABLE_NAME, null, values);
-        }
+        // Insert the new row, returning the primary key value of the new row
+        fishingId = db.insert(Fishings.Properties.TABLE_NAME, null, values);
 
         //close connection
         db.close();
@@ -319,9 +316,9 @@ public class FishingManager {
                                 + ", fishing." + Fishings.Properties._ID + ", fishing." + Fishings.Properties.TOTAL_MONEY + " , customer." + Customers.Properties.FULLNAME + ", customer." + Customers.Properties.MOBILE + ", customer." + Customers.Properties._ID + " AS customerId" + ", customer." + Customers.Properties.ID_NUMBER
                                 + ", keepfishing." + KeepFishing.Properties.KEEP_HOURS + ", keepfishing." + KeepFishing.Properties.NO_KEEP_HOURS + ", keepfishing." + KeepFishing.Properties.KEEP_FISH
                                 + ", keepfishing." + KeepFishing.Properties.TAKE_FISH + ", keepfishing." + KeepFishing.Properties.TOTAL_FISH +
-                        " FROM " +  Fishings.Properties.TABLE_NAME + " fishing, " + Customers.Properties.TABLE_NAME + " customer, " + KeepFishing.Properties.TABLE_NAME + " keepfishing" +
-                        " WHERE " + "customer." + Customers.Properties._ID + " = " + "fishing." + Fishings.Properties.CUSTOMER_ID + " AND " + "fishing." + Fishings.Properties.CUSTOMER_ID + " = " + "keepfishing." + KeepFishing.Properties.CUSTOMER_ID
-                                + " AND fishing." + Fishings.Properties.DATE_IN + " LIKE '" + currentDate + "%'" ;
+                        " FROM " +  Fishings.Properties.TABLE_NAME + " fishing LEFT JOIN " + Customers.Properties.TABLE_NAME + " customer ON " + "fishing." + Fishings.Properties.CUSTOMER_ID + " = customer." + Customers.Properties._ID +
+                        " LEFT JOIN " + KeepFishing.Properties.TABLE_NAME + " keepfishing ON fishing." + Fishings.Properties.CUSTOMER_ID + " = keepfishing." + KeepFishing.Properties.CUSTOMER_ID +
+                        " WHERE fishing." + Fishings.Properties.DATE_IN + " LIKE '" + currentDate + "%'" ;
 
         return db.rawQuery(query, null);
     }

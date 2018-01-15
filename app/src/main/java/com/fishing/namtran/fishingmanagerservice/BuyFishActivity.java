@@ -48,7 +48,7 @@ public class BuyFishActivity extends AppCompatActivity {
 
     // UI references.
     private AutoCompleteTextView mFullNameView;
-    private EditText mMobileView;
+    private EditText mIdNumberView;
     private EditText mTotalFishView;
     private EditText mBuyFishView;
     private EditText mTotalMoneyView;
@@ -66,7 +66,7 @@ public class BuyFishActivity extends AppCompatActivity {
         setContentView(R.layout.activity_buy_fish);
 
         // Set up the login form.
-        mMobileView = (EditText) findViewById(R.id.mobile);
+        mIdNumberView = (EditText) findViewById(R.id.id_number);
         mFullNameView = (AutoCompleteTextView) findViewById(R.id.fullname);
         mBuyFishView = (EditText) findViewById(R.id.buy_fish);
         mTotalMoneyView = (EditText) findViewById(R.id.total_money);
@@ -137,10 +137,10 @@ public class BuyFishActivity extends AppCompatActivity {
         listViewAdapterContent = new String[searchCustomers.getCount()];
         while (searchCustomers.moveToNext())
         {
-            listViewAdapterContent[i] = searchCustomers.getString(searchCustomers.getColumnIndexOrThrow(Customers.Properties.FULLNAME)) + " - " + searchCustomers.getString(searchCustomers.getColumnIndexOrThrow(Customers.Properties.MOBILE)) + " - "
+            listViewAdapterContent[i] = searchCustomers.getString(searchCustomers.getColumnIndexOrThrow(Customers.Properties.FULLNAME)) + " - " + searchCustomers.getString(searchCustomers.getColumnIndexOrThrow(Customers.Properties.ID_NUMBER)) + " - "
                     + searchCustomers.getString(searchCustomers.getColumnIndexOrThrow(KeepFishing.Properties.TOTAL_FISH));
-            notes.put(searchCustomers.getString(searchCustomers.getColumnIndexOrThrow(Customers.Properties.MOBILE)), searchCustomers.getString(searchCustomers.getColumnIndexOrThrow(KeepFishing.Properties.NOTE)));
-            logs.put(searchCustomers.getString(searchCustomers.getColumnIndexOrThrow(Customers.Properties.MOBILE)), searchCustomers.getString(searchCustomers.getColumnIndexOrThrow(Customers.Properties._ID)));
+            notes.put(searchCustomers.getString(searchCustomers.getColumnIndexOrThrow(Customers.Properties.ID_NUMBER)), searchCustomers.getString(searchCustomers.getColumnIndexOrThrow(KeepFishing.Properties.NOTE)));
+            logs.put(searchCustomers.getString(searchCustomers.getColumnIndexOrThrow(Customers.Properties.ID_NUMBER)), searchCustomers.getString(searchCustomers.getColumnIndexOrThrow(Customers.Properties._ID)));
             i++;
         }
 
@@ -159,7 +159,7 @@ public class BuyFishActivity extends AppCompatActivity {
                 mBuyFishView.setText("");
                 mTotalMoneyView.setText("");
                 mFullNameView.setText(fullname[0].trim());
-                mMobileView.setText(fullname[1].trim());
+                mIdNumberView.setText(fullname[1].trim());
                 mTotalFish = Double.parseDouble(fullname[2].trim());
                 mTotalFishView.setText(mTotalFish + "");
                 mNoteView.setText(notes.get(fullname[1].trim()));
@@ -203,7 +203,7 @@ public class BuyFishActivity extends AppCompatActivity {
             public void afterTextChanged(Editable s) {
                 if (mFullNameView.getText().toString().equals("") || listAdapter.isEmpty()) {
                     itemList.setVisibility(View.GONE);
-                    mMobileView.setText("");
+                    mIdNumberView.setText("");
                 }
             }
         });
@@ -224,7 +224,7 @@ public class BuyFishActivity extends AppCompatActivity {
 
         // Store values at the time of the login attempt.
         String fullName = mFullNameView.getText().toString();
-        String mobile = mMobileView.getText().toString();
+        String idNumber = mIdNumberView.getText().toString();
         String totalFish = mTotalFishView.getText().toString();
         String buyFish = mBuyFishView.getText().toString();
         String totalMoney = mTotalMoneyView.getText().toString();
@@ -250,7 +250,7 @@ public class BuyFishActivity extends AppCompatActivity {
             // Show a progress spinner, and kick off a background task to
             // perform the user login attempt.
             showProgress(true);
-            mCustomerTask = new CustomerActionTask(mobile, buyFish, totalFish, totalMoney, status, note);
+            mCustomerTask = new CustomerActionTask(idNumber, buyFish, totalFish, totalMoney, status, note);
             mCustomerTask.execute((Void) null);
         }
     }
@@ -301,15 +301,15 @@ public class BuyFishActivity extends AppCompatActivity {
      */
     public class CustomerActionTask extends AsyncTask<Void, Void, Boolean> {
 
-        private final String mMobile;
+        private final String mIdNumber;
         private final String mBuyFish;
         private final String mTotalMoney;
         private final String mTotalFish;
         private final String mStatus;
         private final String mNote;
 
-        CustomerActionTask(String mobile, String buyFish, String totalFish, String totalMoney, String status, String note) {
-            mMobile = mobile;
+        CustomerActionTask(String idNumber, String buyFish, String totalFish, String totalMoney, String status, String note) {
+            mIdNumber = idNumber;
             mBuyFish = buyFish.equals("") ? "0" : buyFish;
             mTotalMoney = totalMoney.equals("") ? "0" : totalMoney;
             mTotalFish = totalFish.equals("") ? "0" : totalFish;
@@ -340,7 +340,7 @@ public class BuyFishActivity extends AppCompatActivity {
             if (success) {
                 finish();
                 CustomerManager customerManager = new CustomerManager(getApplicationContext());
-                String custId = customerManager.checkCustomerExisted(mMobile) + "";
+                String custId = customerManager.checkIdNumberExisted(mIdNumber) + "";
 
                 KeepFishingManager keepFishingManager = new KeepFishingManager(getApplicationContext());
                 keepFishingManager.createLogsKeepFishingEntry(custId, "0", "0", mTotalFish, "0", mBuyFish, mTotalMoney, mStatus, "", dateTakeFish);

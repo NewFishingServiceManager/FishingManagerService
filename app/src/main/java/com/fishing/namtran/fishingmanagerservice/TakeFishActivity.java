@@ -46,7 +46,7 @@ public class TakeFishActivity extends AppCompatActivity {
 
     // UI references.
     private AutoCompleteTextView mFullNameView;
-    private EditText mMobileView;
+    private EditText mIdNumberView;
     private EditText mKeepFishView;
     private EditText mTakeFishView;
     private EditText mTotalFishView;
@@ -64,7 +64,7 @@ public class TakeFishActivity extends AppCompatActivity {
         setContentView(R.layout.activity_take_fish);
 
         // Set up the login form.
-        mMobileView = (EditText) findViewById(R.id.mobile);
+        mIdNumberView = (EditText) findViewById(R.id.id_number);
         mFullNameView = (AutoCompleteTextView) findViewById(R.id.fullname);
         mKeepFishView = (EditText) findViewById(R.id.keep_fish);
         mTakeFishView = (EditText) findViewById(R.id.take_fish);
@@ -163,10 +163,10 @@ public class TakeFishActivity extends AppCompatActivity {
         listViewAdapterContent = new String[searchCustomers.getCount()];
         while (searchCustomers.moveToNext())
         {
-            listViewAdapterContent[i] = searchCustomers.getString(searchCustomers.getColumnIndexOrThrow(Customers.Properties.FULLNAME)) + " - " + searchCustomers.getString(searchCustomers.getColumnIndexOrThrow(Customers.Properties.MOBILE)) + " - "
+            listViewAdapterContent[i] = searchCustomers.getString(searchCustomers.getColumnIndexOrThrow(Customers.Properties.FULLNAME)) + " - " + searchCustomers.getString(searchCustomers.getColumnIndexOrThrow(Customers.Properties.ID_NUMBER)) + " - "
                                         + searchCustomers.getString(searchCustomers.getColumnIndexOrThrow(KeepFishing.Properties.TOTAL_FISH));
-            notes.put(searchCustomers.getString(searchCustomers.getColumnIndexOrThrow(Customers.Properties.MOBILE)), searchCustomers.getString(searchCustomers.getColumnIndexOrThrow(KeepFishing.Properties.NOTE)));
-            logs.put(searchCustomers.getString(searchCustomers.getColumnIndexOrThrow(Customers.Properties.MOBILE)), searchCustomers.getString(searchCustomers.getColumnIndexOrThrow(Customers.Properties._ID)));
+            notes.put(searchCustomers.getString(searchCustomers.getColumnIndexOrThrow(Customers.Properties.ID_NUMBER)), searchCustomers.getString(searchCustomers.getColumnIndexOrThrow(KeepFishing.Properties.NOTE)));
+            logs.put(searchCustomers.getString(searchCustomers.getColumnIndexOrThrow(Customers.Properties.ID_NUMBER)), searchCustomers.getString(searchCustomers.getColumnIndexOrThrow(Customers.Properties._ID)));
             i++;
         }
 
@@ -185,7 +185,7 @@ public class TakeFishActivity extends AppCompatActivity {
                 mKeepFishView.setText("");
                 mTakeFishView.setText("");
                 mFullNameView.setText(fullname[0].trim());
-                mMobileView.setText(fullname[1].trim());
+                mIdNumberView.setText(fullname[1].trim());
                 mTotalFish = Double.parseDouble(fullname[2].trim());
                 mTotalFishView.setText(mTotalFish + "");
                 mNoteView.setText(notes.get(fullname[1].trim()));
@@ -229,7 +229,7 @@ public class TakeFishActivity extends AppCompatActivity {
             public void afterTextChanged(Editable s) {
                 if (mFullNameView.getText().toString().equals("") || listAdapter.isEmpty()) {
                     itemList.setVisibility(View.GONE);
-                    mMobileView.setText("");
+                    mIdNumberView.setText("");
                 }
             }
         });
@@ -250,7 +250,7 @@ public class TakeFishActivity extends AppCompatActivity {
 
         // Store values at the time of the login attempt.
         String fullName = mFullNameView.getText().toString();
-        String mobile = mMobileView.getText().toString();
+        String idNumber = mIdNumberView.getText().toString();
         String totalFish = mTotalFishView.getText().toString();
         String keepFish = mKeepFishView.getText().toString();
         String takeFish = mTakeFishView.getText().toString();
@@ -276,7 +276,7 @@ public class TakeFishActivity extends AppCompatActivity {
             // Show a progress spinner, and kick off a background task to
             // perform the user login attempt.
             showProgress(true);
-            mCustomerTask = new CustomerActionTask(mobile, keepFish, takeFish, totalFish, feeDoFish, note);
+            mCustomerTask = new CustomerActionTask(idNumber, keepFish, takeFish, totalFish, feeDoFish, note);
             mCustomerTask.execute((Void) null);
         }
     }
@@ -327,15 +327,15 @@ public class TakeFishActivity extends AppCompatActivity {
      */
     public class CustomerActionTask extends AsyncTask<Void, Void, Boolean> {
 
-        private final String mMobile;
+        private final String mIdNumber;
         private final String mKeepFish;
         private final String mTakeFish;
         private final String mTotalFish;
         private final String mFeeDoFish;
         private final String mNote;
 
-        CustomerActionTask(String mobile, String keepFish, String takeFish, String totalFish, String feeDoFish, String note) {
-            mMobile = mobile;
+        CustomerActionTask(String idNumber, String keepFish, String takeFish, String totalFish, String feeDoFish, String note) {
+            mIdNumber = idNumber;
             mKeepFish = keepFish.equals("") ? "0" : keepFish;
             mTakeFish = takeFish.equals("") ? "0" : takeFish;
             mTotalFish = totalFish.equals("") ? "0" : totalFish;
@@ -366,7 +366,7 @@ public class TakeFishActivity extends AppCompatActivity {
             if (success) {
                 finish();
                 CustomerManager customerManager = new CustomerManager(getApplicationContext());
-                String custId = customerManager.checkCustomerExisted(mMobile) + "";
+                String custId = customerManager.checkIdNumberExisted(mIdNumber) + "";
 
                 KeepFishingManager keepFishingManager = new KeepFishingManager(getApplicationContext());
 

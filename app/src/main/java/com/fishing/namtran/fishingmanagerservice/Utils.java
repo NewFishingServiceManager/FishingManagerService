@@ -246,4 +246,14 @@ public class Utils extends AppCompatActivity {
         }
         return false;
     }
+
+    public static boolean checkAfterTime(int hour)
+    {
+        Date currentDate = new Date();
+        if(currentDate.getHours() >= hour && currentDate.getMinutes() >= 0 )
+        {
+            return true;
+        }
+        return false;
+    }
 }
